@@ -1,17 +1,17 @@
-import React, { forwardRef } from "react";
-import { ConnectionQuality } from "@heygen/streaming-avatar";
+import React, { forwardRef } from "react"
+import { ConnectionQuality } from "@heygen/streaming-avatar"
 
-import { useConnectionQuality } from "../logic/useConnectionQuality";
-import { useStreamingAvatarSession } from "../logic/useStreamingAvatarSession";
-import { StreamingAvatarSessionState } from "../logic";
-import { CloseIcon } from "../Icons";
-import { Button } from "../Button";
+import { useConnectionQuality } from "../logic/useConnectionQuality"
+import { useStreamingAvatarSession } from "../logic/useStreamingAvatarSession"
+import { StreamingAvatarSessionState } from "../logic"
+import { CloseIcon } from "../Icons"
+import { Button } from "../Button"
 
 export const AvatarVideo = forwardRef<HTMLVideoElement>(({}, ref) => {
-  const { sessionState, stopAvatar } = useStreamingAvatarSession();
-  const { connectionQuality } = useConnectionQuality();
+  const { sessionState, stopAvatar } = useStreamingAvatarSession()
+  const { connectionQuality } = useConnectionQuality()
 
-  const isLoaded = sessionState === StreamingAvatarSessionState.CONNECTED;
+  const isLoaded = sessionState === StreamingAvatarSessionState.CONNECTED
 
   return (
     <>
@@ -23,7 +23,9 @@ export const AvatarVideo = forwardRef<HTMLVideoElement>(({}, ref) => {
       {isLoaded && (
         <Button
           className="absolute top-3 right-3 !p-2 bg-zinc-700 bg-opacity-50 z-10"
-          onClick={stopAvatar}
+          onClick={() => {
+            stopAvatar()
+          }}
         >
           <CloseIcon />
         </Button>
@@ -32,6 +34,15 @@ export const AvatarVideo = forwardRef<HTMLVideoElement>(({}, ref) => {
         ref={ref}
         autoPlay
         playsInline
+        onClick={async () => {
+          try {
+            // try to play on user click to recover from autoplay block
+            // @ts-ignore
+            await (ref as any)?.current?.play()
+          } catch (err) {
+            console.warn("Click-to-play failed:", err)
+          }
+        }}
         style={{
           width: "100%",
           height: "100%",
@@ -40,12 +51,7 @@ export const AvatarVideo = forwardRef<HTMLVideoElement>(({}, ref) => {
       >
         <track kind="captions" />
       </video>
-      {!isLoaded && (
-        <div className="w-full h-full flex items-center justify-center absolute top-0 left-0">
-          Loading...
-        </div>
-      )}
     </>
-  );
-});
-AvatarVideo.displayName = "AvatarVideo";
+  )
+})
+AvatarVideo.displayName = "AvatarVideo"
