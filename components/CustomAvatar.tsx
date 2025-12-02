@@ -1,6 +1,8 @@
 import {
   AvatarQuality,
   StreamingEvents,
+  TaskMode,
+  TaskType,
   VoiceChatTransport,
   VoiceEmotion,
   StartAvatarRequest,
@@ -38,8 +40,10 @@ const DEFAULT_CONFIG: StartAvatarRequest = {
 
 function InteractiveAvatar({
   initialConfig,
+  initialPreamble,
 }: {
   initialConfig?: StartAvatarRequest
+  initialPreamble?: string
 }) {
   const { initAvatar, startAvatar, stopAvatar, sessionState, stream } =
     useStreamingAvatarSession()
@@ -83,6 +87,21 @@ function InteractiveAvatar({
       })
       avatar.on(StreamingEvents.STREAM_READY, (event) => {
         console.log(">>>>> Stream ready:", event.detail)
+        // Say a preamble once the stream is ready
+        try {
+          const preamble =
+            initialPreamble ?? "Hello! I'm ready — how can I help you today?"
+          if (preamble) {
+            // speak asynchronously so we don't block
+            avatar.speak({
+              text: preamble,
+              taskType: TaskType.REPEAT,
+              taskMode: TaskMode.ASYNC,
+            })
+          }
+        } catch (err) {
+          console.warn("Failed to send preamble:", err)
+        }
       })
       avatar.on(StreamingEvents.USER_START, (event) => {
         console.log(">>>>> User started talking:", event)
@@ -192,15 +211,20 @@ function InteractiveAvatar({
 export default function CustomAvatar({
   basePath,
   initialConfig,
+  initialPreamble,
 }: {
   basePath?: string
   initialConfig?: StartAvatarRequest
+  initialPreamble?: string
 }) {
   return (
     <StreamingAvatarProvider
       basePath={basePath ?? process.env.NEXT_PUBLIC_BASE_API_URL}
     >
-      <InteractiveAvatar initialConfig={initialConfig} />
+      <InteractiveAvatar
+        initialConfig={initialConfig}
+        initialPreamble={initialPreamble}
+      />
     </StreamingAvatarProvider>
   )
 }

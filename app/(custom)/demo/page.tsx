@@ -33,7 +33,13 @@ export default function App() {
     <div className="w-screen h-screen flex flex-col">
       <div className="w-[900px] flex flex-col items-start justify-start gap-5 mx-auto pt-4 pb-20">
         <div className="w-full">
-          <CustomAvatar basePath={basePath} initialConfig={initialConfig} />
+          <CustomAvatar
+            basePath={basePath}
+            initialConfig={initialConfig}
+            initialPreamble={
+              "Hello, I'm Brenda. I'm here to help you understand your rights, obligations and guide you through the processes within the areas of Saskatchewan Human Rights, Occupational Health and Safety, Employment Services and WCB in the province of Saskatchewan."
+            }
+          />
         </div>
       </div>
     </div>
